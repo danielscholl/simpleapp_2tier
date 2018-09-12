@@ -2,6 +2,15 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "prefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Small unique string."
+      },
+      "minLength": 2,
+      "maxLength": 9,
+      "defaultValue": "2tier"
+    },
     "sqlAdministratorLogin": {
       "type": "string",
       "metadata": {
@@ -26,22 +35,21 @@
       "metadata": {
         "description": "Storage Access Token to retrieve private files from storage accounts."
       },
-      "defaultValue": "https://github.com/danielscholl/simpleapp_2tier/blob/master/Database/Simpleapp.bacpac"
+      "defaultValue": "https://cloudcodeit.blob.core.windows.net/public/Simpleapp.bacpac"
     },
     "sasToken": {
       "type": "string",
       "metadata": {
         "description": "Storage Access Token to retrieve private files from storage accounts."
-      },
-      "defaultValue": "?raw=true"
+      }
     }
   },
   "variables": {
-    "hostingPlanName": "[concat('2tier-plan')]",
-    "insightsName": "[concat('2tier-insights')]",
-    "webAppName": "[concat('2tier-web', uniqueString(resourceGroup().id))]",
+    "hostingPlanName": "[concat(parameters('prefix'), '-plan')]",
+    "insightsName": "[concat(parameters('prefix'), '-insights')]",
+    "webAppName": "[concat(parameters('prefix'), uniqueString(resourceGroup().id))]",
     "webAppId": "[resourceId('Microsoft.Web/Sites', variables('webAppName'))]",
-    "sqlserverName": "[concat('2tier-sqlserver', uniqueString(resourceGroup().id))]",
+    "sqlserverName": "[concat(parameters('prefix'), uniqueString(resourceGroup().id))]",
     "storageKeyType": "SharedAccessKey"
   },
   "resources": [
@@ -113,9 +121,39 @@
       },
       "resources": [
         {
-          "type": "siteextensions",
-          "name": "Microsoft.ApplicationInsights.AzureWebSites",
+          "apiVersion": "2016-08-01",
+          "name": "web",
+          "type": "sourcecontrols",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', variables('webAppName'))]"
+          ],
+          "properties": {
+            "RepoUrl": "https://github.com/danielscholl/simpleapp_2tier.git",
+            "branch": "master",
+            "IsManualIntegration": true
+          }
+        },
+        {
+          "apiVersion": "2016-08-01",
+          "name": "logs",
+          "type": "config",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', variables('webAppName'))]"
+          ],
+          "properties": {
+            "httpLogs": {
+              "fileSystem": {
+                "retentionInMb": 100,
+                "retentionInDays": 90,
+                "enabled": true
+              }
+            }
+          }
+        },
+        {
           "apiVersion": "2015-08-01",
+          "name": "Microsoft.ApplicationInsights.AzureWebSites",
+          "type": "siteextensions",
           "dependsOn": [
             "[resourceId('Microsoft.Web/Sites', variables('webAppName'))]"
           ],
@@ -144,7 +182,7 @@
           "tags": {
             "displayName": "Database"
           },
-          "apiVersion": "2015-01-01",
+          "apiVersion": "2014-04-01",
           "dependsOn": [
             "[variables('sqlserverName')]"
           ],
@@ -158,7 +196,7 @@
             {
               "name": "Import",
               "type": "extensions",
-              "apiVersion": "2014-04-01-preview",
+              "apiVersion": "2014-04-01",
               "dependsOn": [
                 "[concat('Microsoft.Sql/servers/', variables('sqlserverName'), '/databases/', parameters('databaseName'))]"
               ],
