@@ -10,24 +10,19 @@
       "minLength": 2,
       "maxLength": 11
     },
-    "appInsightsLocation": {
-      "type": "string"
-    },
     "databaseUsername": {
       "type": "string"
     },
     "databasePassword": {
       "type": "securestring"
-    },
-    "databaseName": {
-      "type": "string"
     }
   },
   "variables": {
     "hostingPlanName": "[concat(parameters('prefix'), '-2tier-plan')]",
     "webAppName": "[concat(parameters('prefix'), '-2tier-web')]",
     "webAppId": "[resourceId('Microsoft.Web/Sites', variables('webAppName'))]",
-    "databaseServerName": "[concat(parameters('prefix'), '-2tier-db')]"
+    "databaseServerName": "[concat(parameters('prefix'), '-2tier-db')]",
+    "databaseName": "SimpleApp"
   },
   "resources": [
     {
@@ -119,7 +114,7 @@
       "resources": [
         {
           "type": "databases",
-          "name": "[parameters('databaseName')]",
+          "name": "[variables('databaseName')]",
           "apiVersion": "2014-04-01-preview",
           "location": "[resourceGroup().location]",
           "properties": {
