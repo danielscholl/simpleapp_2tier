@@ -8,21 +8,75 @@
         "description": "The admin user of the SQL Server"
       }
     },
-    "sqlAdministratorLoginPassword": {
+    "sqlAdministratorPassword": {
       "type": "securestring",
       "metadata": {
         "description": "The password of the admin user of the SQL Server"
       }
+    },
+    "databaseName": {
+      "type": "string",
+      "metadata": {
+        "description": "Storage Access Token to retrieve private files from storage accounts."
+      },
+      "defaultValue": "SimpleApp"
+    },
+    "bacpacURL": {
+      "type": "string",
+      "metadata": {
+        "description": "Storage Access Token to retrieve private files from storage accounts."
+      },
+      "defaultValue": "https://github.com/danielscholl/simpleapp_2tier/blob/master/Database/Simpleapp.bacpac"
+    },
+    "sasToken": {
+      "type": "string",
+      "metadata": {
+        "description": "Storage Access Token to retrieve private files from storage accounts."
+      },
+      "defaultValue": "?raw=true"
     }
   },
   "variables": {
-    "hostingPlanName": "[concat('2tier-plan-', uniqueString(resourceGroup().id))]",
-    "webAppName": "[concat('2tier-web-', uniqueString(resourceGroup().id))]",
+    "hostingPlanName": "[concat('2tier-plan')]",
+    "insightsName": "[concat('2tier-insights')]",
+    "webAppName": "[concat('2tier-web', uniqueString(resourceGroup().id))]",
     "webAppId": "[resourceId('Microsoft.Web/Sites', variables('webAppName'))]",
-    "sqlserverName": "[concat('2tier-sqlserver-', uniqueString(resourceGroup().id))]",
-    "databaseName": "SimpleApp"
+    "sqlserverName": "[concat('2tier-sqlserver', uniqueString(resourceGroup().id))]",
+    "storageKeyType": "SharedAccessKey"
   },
   "resources": [
+    {
+      "comments": "## App Service Plan ##",
+      "name": "[variables('hostingPlanName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2015-08-01",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "Tier": "Standard",
+        "Name": "S1"
+      },
+      "properties": {
+        "name": "[variables('hostingPlanName')]",
+        "workerSizeId": "0",
+        "reserved": false,
+        "numberOfWorkers": 1,
+        "hostingEnvironment": ""
+      }
+    },
+    {
+      "comments": "## Application Insights ##",
+      "name": "[variables('insightsName')]",
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2014-04-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "applicationId": "[variables('webAppName')]",
+        "Request_Source": "AzureTfsExtensionAzureProject"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
+      ]
+    },
     {
       "comments": "## Web App ##",
       "name": "[variables('webAppName')]",
@@ -31,7 +85,7 @@
       "location": "[resourceGroup().location]",
       "dependsOn": [
         "[concat('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
-        "[resourceId('microsoft.insights/components/', variables('webAppName'))]"
+        "[resourceId('microsoft.insights/components/', variables('insightsName'))]"
       ],
       "properties": {
         "name": "[variables('webAppName')]",
@@ -41,7 +95,7 @@
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference(resourceId('microsoft.insights/components/', variables('webAppName')), '2015-05-01').InstrumentationKey]"
+              "value": "[reference(resourceId('microsoft.insights/components/', variables('insightsName')), '2015-05-01').InstrumentationKey]"
             },
             {
               "name": "WEBSITE_NODE_DEFAULT_VERSION",
@@ -70,35 +124,6 @@
       ]
     },
     {
-      "comments": "## App Service Plan ##",
-      "name": "[variables('hostingPlanName')]",
-      "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2015-08-01",
-      "location": "[resourceGroup().location]",
-      "sku": {
-        "Tier": "Standard",
-        "Name": "S1"
-      },
-      "properties": {
-        "name": "[variables('hostingPlanName')]",
-        "workerSizeId": "0",
-        "reserved": false,
-        "numberOfWorkers": 1,
-        "hostingEnvironment": ""
-      }
-    },
-    {
-      "comments": "## Application Insights ##",
-      "name": "[variables('webAppName')]",
-      "type": "Microsoft.Insights/components",
-      "apiVersion": "2014-04-01",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "applicationId": "[variables('webAppName')]",
-        "Request_Source": "AzureTfsExtensionAzureProject"
-      }
-    },
-    {
       "name": "[variables('sqlserverName')]",
       "type": "Microsoft.Sql/servers",
       "location": "[resourceGroup().location]",
@@ -108,12 +133,12 @@
       "apiVersion": "2014-04-01",
       "properties": {
         "administratorLogin": "[parameters('sqlAdministratorLogin')]",
-        "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
+        "administratorLoginPassword": "[parameters('sqlAdministratorPassword')]",
         "version": "12.0"
       },
       "resources": [
         {
-          "name": "[variables('databaseName')]",
+          "name": "[parameters('databaseName')]",
           "type": "databases",
           "location": "[resourceGroup().location]",
           "tags": {
@@ -129,7 +154,24 @@
             "maxSizeBytes": "1073741824",
             "requestedServiceObjectiveName": "Basic"
           },
-          "resources": []
+          "resources": [
+            {
+              "name": "Import",
+              "type": "extensions",
+              "apiVersion": "2014-04-01-preview",
+              "dependsOn": [
+                "[concat('Microsoft.Sql/servers/', variables('sqlserverName'), '/databases/', parameters('databaseName'))]"
+              ],
+              "properties": {
+                "storageKeyType": "[variables('storageKeyType')]",
+                "storageKey": "[parameters('sasToken')]",
+                "storageUri": "[parameters('bacpacURL')]",
+                "administratorLogin": "[parameters('sqlAdministratorLogin')]",
+                "administratorLoginPassword": "[parameters('sqlAdministratorPassword')]",
+                "operationMode": "Import"
+              }
+            }
+          ]
         },
         {
           "type": "firewallRules",
