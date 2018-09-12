@@ -13,13 +13,6 @@
     "appInsightsLocation": {
       "type": "string"
     },
-    "sku": {
-      "type": "string",
-      "metadata": {
-        "description": "App Service Plan Tier."
-      },
-      "defaultValue": "Standard S1"
-    },
     "databaseUsername": {
       "type": "string"
     },
@@ -34,7 +27,8 @@
     "hostingPlanName": "[concat(parameters('prefix'), '-2tier-plan')]",
     "webAppName": "[concat(parameters('prefix'), '-2tier-web')]",
     "webAppId": "[resourceId('Microsoft.Web/Sites', variables('webAppName'))]",
-    "databaseServerName": "[concat(parameters('prefix'), '-2tier-db')]"
+    "databaseServerName": "[concat(parameters('prefix'), '-2tier-db')]",
+    "webSku": "Standard S1"
   },
   "resources": [
     {
@@ -90,8 +84,8 @@
       "apiVersion": "2015-08-01",
       "location": "[resourceGroup().location]",
       "sku": {
-        "Tier": "[first(skip(split(parameters('sku'), ' '), 1))]",
-        "Name": "[first(split(parameters('sku'), ' '))]"
+        "Tier": "[first(skip(split(variables('sku'), ' '), 1))]",
+        "Name": "[first(split(variables('sku'), ' '))]"
       },
       "properties": {
         "name": "[variables('hostingPlanName')]",
@@ -106,7 +100,7 @@
       "name": "[variables('webAppName')]",
       "type": "Microsoft.Insights/components",
       "apiVersion": "2014-04-01",
-      "location": "[parameters('appInsightsLocation')]",
+      "location": "[resourceGroup().location]",
       "properties": {
         "applicationId": "[variables('webAppName')]",
         "Request_Source": "AzureTfsExtensionAzureProject"
