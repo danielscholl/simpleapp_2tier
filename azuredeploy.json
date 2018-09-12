@@ -27,8 +27,7 @@
     "hostingPlanName": "[concat(parameters('prefix'), '-2tier-plan')]",
     "webAppName": "[concat(parameters('prefix'), '-2tier-web')]",
     "webAppId": "[resourceId('Microsoft.Web/Sites', variables('webAppName'))]",
-    "databaseServerName": "[concat(parameters('prefix'), '-2tier-db')]",
-    "webSku": "Standard S1"
+    "databaseServerName": "[concat(parameters('prefix'), '-2tier-db')]"
   },
   "resources": [
     {
@@ -84,8 +83,8 @@
       "apiVersion": "2015-08-01",
       "location": "[resourceGroup().location]",
       "sku": {
-        "Tier": "[first(skip(split(variables('sku'), ' '), 1))]",
-        "Name": "[first(split(variables('sku'), ' '))]"
+        "Tier":"Standard",
+        "Name":"S1"
       },
       "properties": {
         "name": "[variables('hostingPlanName')]",
