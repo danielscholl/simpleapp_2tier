@@ -45,12 +45,13 @@
     }
   },
   "variables": {
-    "hostingPlanName": "[concat(parameters('prefix'), '-plan')]",
-    "insightsName": "[concat(parameters('prefix'), '-insights')]",
-    "webAppName": "[concat(parameters('prefix'), uniqueString(resourceGroup().id))]",
+    "hostingPlanName": "[concat(parameters('prefix'), uniqueString(resourceGroup().id), '-plan')]",
+    "insightsName": "[concat(parameters('prefix'), uniqueString(resourceGroup().id), '-insights')]",
+    "webAppName": "[concat(parameters('prefix'), uniqueString(resourceGroup().id), '-web')]",
+    "sqlserverName": "[concat(parameters('prefix'), uniqueString(resourceGroup().id),'-server')]",
     "webAppId": "[resourceId('Microsoft.Web/Sites', variables('webAppName'))]",
-    "sqlserverName": "[concat(parameters('prefix'), uniqueString(resourceGroup().id))]",
-    "storageKeyType": "SharedAccessKey"
+    "storageKeyType": "SharedAccessKey",
+    "connectionstring": "[concat('Server=tcp:',variables('sqlserverName'),'.database.windows.net',',1433;Initial Catalog=',parameters('databaseName'),';Persist Security Info=False;User ID=',parameters('sqlAdministratorLogin'),';Password=',parameters('sqlAdministratorPassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;')]"
   },
   "resources": [
     {
@@ -80,10 +81,7 @@
       "properties": {
         "applicationId": "[variables('webAppName')]",
         "Request_Source": "AzureTfsExtensionAzureProject"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
-      ]
+      }
     },
     {
       "comments": "## Web App ##",
@@ -113,7 +111,7 @@
           "connectionStrings": [
             {
               "name": "ConnectionString",
-              "connectionString": "Server=myServerAddress;Database=myDataBase;Trusted_Connection=True;"
+              "connectionString": "[variables('connectionstring')]"
             }
           ],
           "phpVersion": "7.1"

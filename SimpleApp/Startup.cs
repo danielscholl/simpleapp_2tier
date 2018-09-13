@@ -37,6 +37,12 @@ namespace SimpleApp
                         ? environmentConnectionString
                         : @"Data Source=(localdb)\MSSQLLocalDB;Database=SimpleAppDB;Trusted_connection=True;";
 
+            // Use SQL Database if in Azure, otherwise, use SQLite
+            if(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
+                services.AddDbContext<SimpleAppContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("CONNECTIONSTRING")));
+            else
+                services.AddDbContext<SimpleAppContext>(opt => opt.UseSqlServer(connection));
+
             services.AddScoped<ProductRepository>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
