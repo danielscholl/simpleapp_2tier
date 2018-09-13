@@ -80,6 +80,9 @@
       "type": "Microsoft.Insights/components",
       "apiVersion": "2014-04-01",
       "location": "[resourceGroup().location]",
+      "tags": {
+        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('webAppName'))]": "Resource"
+      },
       "properties": {
         "applicationId": "[variables('webAppName')]",
         "Request_Source": "AzureTfsExtensionAzureProject"
@@ -92,10 +95,12 @@
       "apiVersion": "2016-08-01",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[concat('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
-        "[resourceId('microsoft.insights/components/', variables('insightsName'))]",
-        "[resourceId('Microsoft.Sql/servers/', variables('sqlserverName'))]"
+        "[resourceId('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
+        "[resourceId('microsoft.insights/components/', variables('insightsName'))]"
       ],
+      "tags": {
+        "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('hostingPlanName'))]": "empty"
+      },
       "properties": {
         "name": "[variables('webAppName')]",
         "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
