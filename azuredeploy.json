@@ -93,7 +93,8 @@
       "location": "[resourceGroup().location]",
       "dependsOn": [
         "[concat('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
-        "[resourceId('microsoft.insights/components/', variables('insightsName'))]"
+        "[resourceId('microsoft.insights/components/', variables('insightsName'))]",
+        "[resourceId('Microsoft.Sql/servers/', variables('sqlserverName'))]"
       ],
       "properties": {
         "name": "[variables('webAppName')]",
