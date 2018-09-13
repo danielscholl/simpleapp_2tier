@@ -1,4 +1,4 @@
-# Simple Demo Code Base for a 2 Tier Deployment
+# Demo for a Simple 2 Tier Deployment
 
 [![Build Status](https://cloudcodeit.visualstudio.com/DemoStuff/_apis/build/status/danielscholl.simpleapp_2tier)](https://cloudcodeit.visualstudio.com/DemoStuff/_build/latest?definitionId=25)
 
