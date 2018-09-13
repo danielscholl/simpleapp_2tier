@@ -14,34 +14,36 @@
     "sqlAdministratorLogin": {
       "type": "string",
       "metadata": {
-        "description": "The admin user of the SQL Server"
-      }
+        "description": "Admin user login name for SQL Server"
+      },
+      "defaultValue": "azureuser"
     },
     "sqlAdministratorPassword": {
       "type": "securestring",
       "metadata": {
-        "description": "The password of the admin user of the SQL Server"
+        "description": "Admin user password for SQL Server"
       }
     },
     "databaseName": {
       "type": "string",
       "metadata": {
-        "description": "Storage Access Token to retrieve private files from storage accounts."
+        "description": "SQL Server Database Name."
       },
       "defaultValue": "SimpleApp"
     },
     "bacpacURL": {
       "type": "string",
       "metadata": {
-        "description": "Storage Access Token to retrieve private files from storage accounts."
+        "description": "URL Location of the Database backup (bacpac)."
       },
       "defaultValue": "https://cloudcodeit.blob.core.windows.net/public/Simpleapp.bacpac"
     },
     "sasToken": {
       "type": "string",
       "metadata": {
-        "description": "Storage Access Token to retrieve private files from storage accounts."
-      }
+        "description": "Storage Access Token to retrieve file if required."
+      },
+      "defaultValue": "?"
     }
   },
   "variables": {
