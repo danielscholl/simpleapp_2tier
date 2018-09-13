@@ -104,8 +104,8 @@
               "value": "[reference(resourceId('microsoft.insights/components/', variables('insightsName')), '2015-05-01').InstrumentationKey]"
             },
             {
-              "name": "WEBSITE_NODE_DEFAULT_VERSION",
-              "value": "6.9.1"
+              "name": "ASPNETCORE_ENVIRONMENT",
+              "value": "Production"
             }
           ],
           "connectionStrings": [
@@ -113,8 +113,7 @@
               "name": "ConnectionString",
               "connectionString": "[variables('connectionstring')]"
             }
-          ],
-          "phpVersion": "7.1"
+          ]
         }
       },
       "resources": [
