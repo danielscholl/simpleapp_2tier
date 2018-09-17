@@ -76,7 +76,7 @@
     },
     {
       "comments": "## Application Insights ##",
-      "name": "[variables('insightsName')]",
+      "name": "[variables('webAppName')]",
       "type": "Microsoft.Insights/components",
       "apiVersion": "2014-04-01",
       "location": "[resourceGroup().location]",
@@ -96,7 +96,7 @@
       "location": "[resourceGroup().location]",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
-        "[resourceId('microsoft.insights/components/', variables('insightsName'))]"
+        "[resourceId('microsoft.insights/components/', variables('webAppName'))]"
       ],
       "tags": {
         "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('hostingPlanName'))]": "empty"
@@ -109,7 +109,7 @@
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference(resourceId('microsoft.insights/components/', variables('insightsName')), '2015-05-01').InstrumentationKey]"
+              "value": "[reference(resourceId('microsoft.insights/components/', variables('webAppName')), '2015-05-01').InstrumentationKey]"
             },
             {
               "name": "ASPNETCORE_ENVIRONMENT",
