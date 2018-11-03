@@ -79,7 +79,7 @@
       "name": "[variables('webAppName')]",
       "type": "Microsoft.Insights/components",
       "apiVersion": "2015-05-01",
-      "kind": "Microsoft.Insights/components",
+      "kind": "web",
       "location": "[resourceGroup().location]",
       "tags": {
         "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('webAppName'))]": "Resource"
