@@ -76,7 +76,7 @@
     },
     {
       "comments": "## Application Insights ##",
-      "name": "[variables('insightsName')]",
+      "name": "[variables('webAppName')]",
       "type": "Microsoft.Insights/components",
       "apiVersion": "2015-05-01",
       "kind": "Microsoft.Insights/components",
