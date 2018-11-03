@@ -76,9 +76,10 @@
     },
     {
       "comments": "## Application Insights ##",
-      "name": "[variables('webAppName')]",
+      "name": "[variables('insightsName')]",
       "type": "Microsoft.Insights/components",
       "apiVersion": "2015-05-01",
+      "kind": "Microsoft.Insights/components",
       "location": "[resourceGroup().location]",
       "tags": {
         "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('webAppName'))]": "Resource"
@@ -107,16 +108,6 @@
         "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
         "hostingEnvironment": "",
         "siteConfig": {
-          "appSettings": [
-            {
-              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference(resourceId('microsoft.insights/components/', variables('webAppName')), '2015-05-01').InstrumentationKey]"
-            },
-            {
-              "name": "ASPNETCORE_ENVIRONMENT",
-              "value": "Production"
-            }
-          ],
           "connectionStrings": [
             {
               "name": "ConnectionString",
@@ -164,6 +155,20 @@
             "[resourceId('Microsoft.Web/Sites', variables('webAppName'))]"
           ],
           "properties": {}
+        },
+        {
+          "name": "appsettings",
+          "type": "config",
+          "apiVersion": "2016-08-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('webAppName'))]",
+            "[resourceId('microsoft.insights/components', variables('webAppName'))]",
+            "Microsoft.ApplicationInsights.AzureWebSites"
+          ],
+          "properties": {
+            "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('webAppName')), '2015-05-01').InstrumentationKey]",
+            "ASPNETCORE_ENVIRONMENT": "Production"
+          }
         }
       ]
     },
