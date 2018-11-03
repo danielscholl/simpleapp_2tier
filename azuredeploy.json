@@ -135,7 +135,8 @@
           "type": "config",
           "apiVersion": "2016-08-01",
           "dependsOn": [
-            "[resourceId('Microsoft.Web/Sites', variables('webAppName'))]"
+            "[resourceId('Microsoft.Web/Sites', variables('webAppName'))]",
+            "web"
           ],
           "properties": {
             "httpLogs": {
@@ -163,7 +164,8 @@
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('webAppName'))]",
             "[resourceId('Microsoft.Insights/components', variables('webAppName'))]",
-            "Microsoft.ApplicationInsights.AzureWebSites"
+            "Microsoft.ApplicationInsights.AzureWebSites",
+            "logs"
           ],
           "properties": {
             "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('webAppName')), '2015-05-01').InstrumentationKey]",
